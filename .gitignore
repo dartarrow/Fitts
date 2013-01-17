@@ -1,0 +1,13 @@
+# Program generated output #
+############################
+*.mov
+*.clk
+*.att
+*.fp
+
+# binary files, data files and old backups #
+############################################
+bin
+zal
+zzal
+data
