@@ -253,9 +253,7 @@ public class AttemptData {
 	
 	public String dumpInfo(int tg)
 	{	String out;
-		double ret[] = {0,0};
-		double A[][]=new double[tg+1][3];
-	
+			
 		if(tg<0) return "Nothing!";
 		out = tg+"#"+target+" d :" + nf.format(lenghts[tg])+" t :" + nf.format(times[tg]) + " s :"+sizes[tg];
 		out+= " ID :" + nf.format(ID(lenghts[tg],sizes[tg]));

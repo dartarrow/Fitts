@@ -27,7 +27,7 @@ public class FittsKeyListener extends Object implements KeyListener {
 		Point m=new Point(),n = new Point();
 		int s=0;
 		
-		System.out.println("key :"+e.getKeyCode()+" "+e.getKeyText(e.getKeyCode()));
+		System.out.println("key :"+e.getKeyCode()+" "+KeyEvent.getKeyText(e.getKeyCode()));
 		
 		if(attempt==null || attempt.finished()) return;
 		System.out.println(" tgt :"+attempt.targetCharCode);

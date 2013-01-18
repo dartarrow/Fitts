@@ -4,7 +4,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.Point;
-import java.awt.geom.Point2D;
 
 public class FittsMouseListener extends Object implements MouseListener, MouseMotionListener {
 

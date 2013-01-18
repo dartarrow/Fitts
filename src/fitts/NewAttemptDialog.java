@@ -16,13 +16,14 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 	static final String[] weightTypes = { "none","0.5", "1", "1.5" ,"2","3" };
 	static final String[] targetsLabels = {"3","4","5","6","7","8","9","10","20","30","50","60","100","120","200","300","500"};
 	static final String[] diamLabels = {"variable","random","10","20","30","40","50"};
-	static final String[] generationType = {"series","random","random - 20 & 30","fixed distance",
+	static final String[] generationType = {"series","random","random - 20 & 30","fixed distance",	
 	"horizontal defined",
 	"horizontal scale",
 	"horizontal short and long",
 	"horizontal three step","horizontal five step","horizontal five step unadjusted",
 	"horizontal increasing","horizontal increasing long","horizontal decreasing","horizontal variable",
 	"return to center - random distance","return to center - fixed distance"};
+	static final long serialVersionUID = 0;
 	static final String[] keyGenerationType = {"two targets","three targets","five targets"};
 	static final int SERIES = 0;
 	static final int RANDOM = 1;
@@ -51,11 +52,11 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 	JTextField[] tfields;
 	JTextField tprof;
 	JTextField distanceFld;
-	JComboBox weightList;
-	JComboBox targetList;
-	JComboBox typeList;
-	JComboBox diamList;
-	JComboBox keyTypeList;
+	JComboBox<String> weightList;
+	JComboBox<String> targetList;
+	JComboBox<String> typeList;
+	JComboBox<String> diamList;
+	JComboBox<String> keyTypeList;
 	JTextField[][] coords = new JTextField[5][2];
 	int inType;
 	
@@ -69,7 +70,7 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 	}
 	private void createContent()
 	{	this.getContentPane().removeAll();
-		JPanel fields = new JPanel();
+		//JPanel fields = new JPanel();
 		JPanel profile = new JPanel();
 		JPanel buttons = new JPanel();
 		JPanel atFields = new JPanel();
@@ -182,15 +183,15 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		JPanel fields = new JPanel();
 		JPanel f2 = new JPanel();
 		fields.add(new JLabel("weights"));
-		weightList = new JComboBox(weightTypes);
+		weightList = new JComboBox<String>(weightTypes);
 		weightList.setSelectedIndex(med.iniFile.weightList);
 		fields.add(weightList);
 		fields.add(new JLabel("targets"));
-		targetList = new JComboBox(targetsLabels);
+		targetList = new JComboBox<String>(targetsLabels);
 		targetList.setSelectedIndex(med.iniFile.targetList);
 		fields.add(targetList);
 		fields.add(new JLabel("diameter"));
-		diamList = new JComboBox(diamLabels);
+		diamList = new JComboBox<String>(diamLabels);
 		diamList.setSelectedIndex(med.iniFile.diamList);
 		fields.add(diamList);
 		fields.add(new JLabel("distance"));
@@ -204,7 +205,7 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		
 		f2.setLayout(new BoxLayout(f2,BoxLayout.LINE_AXIS));
 		f2.add(new JLabel("generation"));
-		typeList = new JComboBox(generationType);
+		typeList = new JComboBox<String>(generationType);
 		typeList.setSelectedIndex(med.iniFile.typeList);
 		f2.add(typeList);
 		f2.setMaximumSize(new Dimension(280,20));
@@ -257,15 +258,15 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 	private JPanel createKeyFields()
 	{	JPanel fields = new JPanel();
 		fields.add(new JLabel("weights"));
-		weightList = new JComboBox(weightTypes);
+		weightList = new JComboBox<String>(weightTypes);
 		weightList.setSelectedIndex(med.iniFile.weightList);
 		fields.add(weightList);
 		fields.add(new JLabel("targets"));
-		targetList = new JComboBox(targetsLabels);
+		targetList = new JComboBox<String>(targetsLabels);
 		targetList.setSelectedIndex(med.iniFile.targetList);
 		fields.add(targetList);
 		fields.add(new JLabel("generation"));
-		keyTypeList = new JComboBox(keyGenerationType);
+		keyTypeList = new JComboBox<String>(keyGenerationType);
 		keyTypeList.setSelectedIndex(med.iniFile.keyTypeList);
 		fields.add(keyTypeList);
 		
@@ -398,7 +399,7 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 			
 			}
 			catch(IOException ex)
-			{	new JOptionPane().showMessageDialog(med, "Couldn't save preferences to ini file.");
+			{	JOptionPane.showMessageDialog(med, "Couldn't save preferences to ini file.");
 				
 			}
 			if(inType == AttemptData.MOUSE) 

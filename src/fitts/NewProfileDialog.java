@@ -3,10 +3,9 @@ package fitts;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Ellipse2D;
-import java.io.*;
 
 public class NewProfileDialog extends JDialog implements ActionListener {
+	static final long serialVersionUID = 0;
 	JTextField[] tfields;
 	JTextArea textArea;
 	int hm = 0;
@@ -79,7 +78,7 @@ public class NewProfileDialog extends JDialog implements ActionListener {
 		
 		
 		BlankArea ba = med.blankArea;
-		ba.setNewCircle(ba.X_SIZE/16, ba.Y_SIZE*5/16, 30);
+		ba.setNewCircle(BlankArea.X_SIZE/16, BlankArea.Y_SIZE*5/16, 30);
 		ba.repaint();
 		setVisible(true);
 		

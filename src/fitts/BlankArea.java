@@ -11,7 +11,8 @@ import java.awt.Point;
 import java.awt.event.*;
 
 public class BlankArea extends JPanel {
-    //Dimension minSize = new Dimension(500, 500);
+	//Dimension minSize = new Dimension(500, 500);
+	static final long serialVersionUID = 0;
     Ellipse2D.Double circle = null;
     static final int X_SIZE = 900;
     static final int Y_SIZE = 450;
@@ -265,7 +266,6 @@ public class BlankArea extends JPanel {
     
     public Point createNewLearnTarget(AttemptData attempt)
 	{	int tx,ty,nd;
-		int max_height;
 		nd = attempt.diameter;
     	tx = (int) (attempt.pGenerator.nextDouble()*(getWidth()-nd));
     	ty = (int) (attempt.pGenerator.nextDouble()*(getHeight()-nd));

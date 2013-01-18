@@ -85,7 +85,7 @@ public class UserProfile {
     	
     	}
     	catch(IOException e)
-    	{	new JOptionPane().showMessageDialog(fr, "I/O Error!");
+    	{	JOptionPane.showMessageDialog(fr, "I/O Error!");
     		
     	}
     	return loadProfile(fr,file);
@@ -107,17 +107,18 @@ public class UserProfile {
     	}
     	
     	catch(FileNotFoundException e){
-    			new JOptionPane().showMessageDialog(fr, "File not found!");
+    			JOptionPane.showMessageDialog(fr, "File not found!");
     		}
-    	catch(IOException e){
-    			new JOptionPane().showMessageDialog(fr, "I/O Error!");
-    		}
+    	/*catch(IOException e){
+			JOptionPane.showMessageDialog(fr, "I/O Error!");
+		}*/
+    	
     	finally {
     			if (s != null) {
     				s.close();
             }
     	}
-    	if(i<6) { new JOptionPane().showMessageDialog(fr, "Profile corrupt!"); return null;}
+    	if(i<6) { JOptionPane.showMessageDialog(fr, "Profile corrupt!"); return null;}
     	try
     	{	name = buf[0];
     		surname = buf[1];
@@ -130,7 +131,7 @@ public class UserProfile {
     		comments = com;
     	} catch(Exception e)
     	{	
-    		new JOptionPane().showMessageDialog(fr, "Profile corrupt, probably old!"); 
+    		JOptionPane.showMessageDialog(fr, "Profile corrupt, probably old!"); 
        	
     	}
     	return this;

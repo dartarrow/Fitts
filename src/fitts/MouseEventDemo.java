@@ -49,6 +49,7 @@ import javax.swing.JOptionPane;
 
 
 public class MouseEventDemo extends JPanel {
+	static final long serialVersionUID = 0;
     UserProfile profile;
 	private AttemptData attempt = null;
 	IniFile iniFile = new IniFile();
@@ -127,7 +128,7 @@ public class MouseEventDemo extends JPanel {
 			}
         }
         catch(IOException e)
-        {	new JOptionPane().showMessageDialog(frame, "Error loading ini file!");
+        {	JOptionPane.showMessageDialog(frame, "Error loading ini file!");
         	
         }
         
