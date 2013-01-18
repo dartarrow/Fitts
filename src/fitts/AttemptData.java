@@ -8,6 +8,12 @@ import java.util.Random;
 import optimization.*;
 import java.text.NumberFormat;
 
+/**
+ * Class storing attempt data
+ * @author tzeentch
+ *
+ */
+
 public class AttemptData {
 	String profile;
 	String weights;
@@ -27,9 +33,9 @@ public class AttemptData {
 	Point old = null;
 	long otime = 0;
 	long score = 0;
-	double cum_length = 0;
-	double cum_time = 0;
-	double cum_travel = 0; 
+	double c_length = 0; // cumulative length of route from first to last target
+	double c_time = 0; // cumulative time taken hitting targets
+	double c_travel = 0; // cumulative length traveled while hitting targets
 	double length = 0;
 	Random pGenerator,dGenerator; 
 	StopWatch stopWatch = new StopWatch();
@@ -41,6 +47,9 @@ public class AttemptData {
 	int[] sizes;
 	boolean[] outliers;
 	
+	/**
+	 * Creates a blank new AttemptData object
+	 */
 	public AttemptData()
 	{	profile = "none";
 		attempt = 0;
@@ -116,77 +125,125 @@ public class AttemptData {
 		else dGenerator = new Random(maxTargets*100);
 	}
 	
+	/**
+	 * Is this attempt currently running ? - it has already started and not finished yet.
+	 * @return true when yes, false if not
+	 */
 	public boolean running()
 	{	if(target>-1 && target<maxTargets) return true;
 	 	return false;
 	}
 	
+	/**
+	 * Is this attempt finished ?
+	 * @return true when yes, false if not
+	 */
 	public boolean finished()
 	{	if(target>= maxTargets) return true;
 	 	return false;
 	}
 	
-	public void addLenght(double lenght)
-	{	lenghts[target]=lenght;
+	/**
+	 * Adds to the list of lengths 
+	 * @param lenght length added
+	 */
+	public void addLenght(double length)
+	{	lenghts[target]=length;
 	}
 	
+	/**
+	 * Adds to the list of times taken
+	 * @param time time added
+	 */
 	public void addTime(double time)
 	{	times[target]=time;
 	}
 	
+	/**
+	 * Adds a hit of a target to the mouseData and proceed to the next target
+	 * @param click coordinates of the click
+	 * @param tgt coordinates of the target
+	 * @param size size of the target
+	 */
 	public void addHit(Point click, Point tgt, int size)
 	{	long time = stopWatch.getElapsedTime();
-		if(target==-1)
+		if(target==-1) //effectively starting a new attempt, no previous target
 		{	target++;
 			old = click;
 			stopWatch.start();
 			return;
 		}
 		mouseData[target].addClick(click, time);
-		/*if(target>0) times[target] = time-times[target-1];
-		else times[target] = time;*/
 		sizes[target] = size;
 		times[target] = time - otime;
 		otime = time;
 		lenghts[target] = old.distance(click);
 		
 		old = click;
-		cum_travel = cum_travel + countTravel(target);
-		cum_length = cum_length+lenghts[target];
-		if(target > 0) cum_time = cum_time + times[target];
+		c_travel = c_travel + countTravel(target);
+		c_length = c_length+lenghts[target];
+		if(target > 0) c_time = c_time + times[target];
 		target ++;
 	}
 	
+	/**
+	 * Adds a missed click to the mouseData
+	 * @param click coordinates of the click
+	 * @param tgt coordinates of the target
+	 */
 	public void addMiss(Point click, Point tgt)
 	{	if(!running() || finished()) return;
 		long time = stopWatch.getElapsedTime();
 		mouseData[target].addClick(click, time);
 	}
 	
+	/**
+	 * Adda mouse move to the mouseData
+	 * @param point
+	 */
 	public void addMove(Point point)
 	{	mouseData[target].addMove(point, stopWatch.getElapsedTime());
 	}
 	
+	/**
+	 * Count the ammount of travel taken to hit target i
+	 * @param i index of target
+	 * @return length traveled
+	 */
 	public double countTravel(int i)
-    {	double cnt=0;
+    {	double len=0;
     	for(int j=1; j<mouseData[i].moves.size(); j++){
-    		cnt+=mouseData[i].moves.get(j).point.distance(mouseData[i].moves.get(j-1).point);
+    		len+=mouseData[i].moves.get(j).point.distance(mouseData[i].moves.get(j-1).point);
     	}
-    	return cnt;
+    	return len;
     }
 	
+	/**
+	 * Count the Fitt's law ID parameter
+	 * @param distance distance to target
+	 * @param size of target
+	 * @return Fitt's law ID parameter
+	 */
 	public double ID(double distance, double size)
 	{	return Math.log(distance/size +1)/Math.log(2);
 		
 	}
 	
+	/**
+	 * Log statistics of the attempt - average speed of approach to target, average speed of movement, distance traveled per distance to target
+	 */
 	void logStatistics()
-	{	log +="avg target Speed : "+cum_length/cum_time+"\n";
-		log +="avg travel Speed : "+cum_travel/cum_time+"\n";
-		log +="travel per distance : "+cum_travel/cum_length+"\n";
+	{	log +="avg target Speed : "+c_length/c_time+"\n";
+		log +="avg travel Speed : "+c_travel/c_time+"\n";
+		log +="travel per distance : "+c_travel/c_length+"\n";
 		
 		
 	}
+	
+	/**
+	 * Count Fitt's law A and B parameters and log them
+	 * @return A and B parameters (Point2D)
+	 */
 	
 	public Point2D refineCountAB()
 	{	double[] diffs = new double[maxTargets];
@@ -215,10 +272,11 @@ public class AttemptData {
 		ab = countAB();
 		log+= "A :"+nfd.format(ab.getX())+" B : "+nfd.format(ab.getY())+"\n";
 				
-		return countAB();
+		return ab;
 	}
+	
 		
-	public Point2D countAB(int start, int end)
+	private Point2D countAB(int start, int end)
 	{	double ret[] = {0,0};
 		int outl=0;
 		if(end >= maxTargets || start > end) return null;
@@ -245,11 +303,21 @@ public class AttemptData {
 		return new Point2D.Double(ret[0],ret[1]);
 	}
 	
+	/**
+	 * 
+	 * @return A and B Fitt's law parameters
+	 */
+	
 	public Point2D countAB()
 	{	return countAB(0,maxTargets-1);
 		
 	}
 	
+	
+	/**
+	 * @param tg index of target to dump info about
+	 * @return String info about distance, time, size and ID Fitt's law parameter of target
+	 */
 	
 	public String dumpInfo(int tg)
 	{	String out;
@@ -257,14 +325,19 @@ public class AttemptData {
 		if(tg<0) return "Nothing!";
 		out = tg+"#"+target+" d :" + nf.format(lenghts[tg])+" t :" + nf.format(times[tg]) + " s :"+sizes[tg];
 		out+= " ID :" + nf.format(ID(lenghts[tg],sizes[tg]));
-		/*
+		
 		if(tg > 0)
 		{	Point2D ab = countAB(0,tg);
 			out+= " A :" + ab.getX() + " B :" + ab.getY() + " "+tg;
-		}*/
+		}
 		return out;
 	}
 	
+	
+	/**
+	 * save info about current attempt - creates a .clk file with click locations and times,
+	 * .mov file with moves and .att file with general attempt info
+	 */
 	public void saveAttempt()
     {	PrintWriter out_c = null,out_m=null,out_a=null;
     	try {

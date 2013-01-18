@@ -1,73 +1,34 @@
-/*
- * Copyright (c) 1995 - 2008 Sun Microsystems, Inc.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   - Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Sun Microsystems nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */ 
-
 package fitts;
-
-/*
-* MouseEventDemo.java
-*/
-
 import javax.swing.*;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.Random;
 import java.text.NumberFormat;
 import java.io.*;
-
-
 import javax.swing.JOptionPane;
 
 
-
-public class MouseEventDemo extends JPanel {
+public class FittsMain extends JPanel {
 	static final long serialVersionUID = 0;
-    UserProfile profile;
-	private AttemptData attempt = null;
-	IniFile iniFile = new IniFile();
-	BlankArea blankArea;
-    JTextArea textArea;
-    static final String NEWLINE = System.getProperty("line.separator");
+	static final String NEWLINE = System.getProperty("line.separator");
     static final int RANDOM = 0;
     static final int PRESET = 1;
     static JFrame frame;
-    //MouseData[] mouseData = null;
-    //int count = -1;
+    private AttemptData attempt = null;
+	private static JMenuBar menuBar;
+	
+	int Repetition = 0;
+	int MaxRepetitions = 0;
+	int Task = 0;
+	int MaxTask = 0;
+	int[] Order;
+	
+	IniFile iniFile = new IniFile();
+	UserProfile profile;
+	BlankArea blankArea;
+    JTextArea textArea;
+    
     NumberFormat nf = NumberFormat.getInstance();
-    private static JMenuBar menuBar;
-    int Repetition = 0;
-    int MaxRepetitions = 0;
-    int Task = 0;
-    int MaxTask = 0;
-    int[] Order;
     
     public static void main(String[] args) {
         /* Use an appropriate Look and Feel */
@@ -84,8 +45,7 @@ public class MouseEventDemo extends JPanel {
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
-        /* Turn off metal's use of bold fonts */
-        UIManager.put("swing.boldMetal", Boolean.FALSE);
+        
         //Schedule a job for the event dispatch thread:
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -108,7 +68,7 @@ public class MouseEventDemo extends JPanel {
         
         
         //Create and set up the content pane.
-        MouseEventDemo newContentPane = new MouseEventDemo();
+        FittsMain newContentPane = new FittsMain();
         menuBar = newContentPane.createMenuBar();
         frame.setJMenuBar(menuBar);
         newContentPane.setOpaque(true); //content panes must be opaque
@@ -134,7 +94,7 @@ public class MouseEventDemo extends JPanel {
         
     }
     
-    public MouseEventDemo() {
+    public FittsMain() {
     	super(new SpringLayout());
     	SpringLayout sl = (SpringLayout) this.getLayout();
     	
@@ -168,10 +128,10 @@ public class MouseEventDemo extends JPanel {
         //newAttempt();
         
         //Register for mouse events on blankArea and the panel.
-        FittsMouseListener fml = new FittsMouseListener(this);
+        MouseListener fml = new MouseListener(this);
         blankArea.addMouseListener(fml);
         blankArea.addMouseMotionListener(fml);
-        FittsKeyListener fkl = new FittsKeyListener(this);
+        KeyListener fkl = new KeyListener(this);
         blankArea.addKeyListener(fkl);
         blankArea.setFocusTraversalPolicyProvider(true);
         //addMouseListener(this);
@@ -184,47 +144,65 @@ public class MouseEventDemo extends JPanel {
         
         
     }
+    
     public void newProfile()
     {	new NewProfileDialog(this);
     	    	
     }
-    
-      
+          
     /**
      * Resets the current attempt and resets all variables.
      */
     public void resetAttempt()
     {	
-	//count = -1;
 	attempt = new AttemptData();
 	if(menuBar != null)
 		menuBar.getMenu(0).getMenuComponent(4).setEnabled(false);
     	
     }
     
+    /**
+     * open a window to select a UserProfile file to load
+     */
     public void loadProfile()
     {	UserProfile n = new UserProfile();
     	n.loadProfile(frame);
     	setProfile(n);
     }
     
+    /**
+     * Save current UserProfile
+     */
     public void saveProfile()
     {	profile.saveProfile();
     }
     
+    /**
+     * Get the current UserProfile
+     * @return profile
+     */
     public UserProfile getProfile()
     {	return profile;
     }
     
+    /**
+     * open the NewAttemptDialog
+     */
     public void newAttempt()
     {	new NewAttemptDialog(this);
     }
     
+    /**
+     * Set the attempt data to the current session
+     */
     public void setAttempt(AttemptData n)
     {	attempt = n;
     	
     }
     
+    /**
+     * Save the attempt
+     */
     public void saveAttempt(AttemptData n)
     {	attempt.saveAttempt();
     	
@@ -247,13 +225,13 @@ public class MouseEventDemo extends JPanel {
     	JMenuItem menuItem;
     	
     	JMenu menu = new JMenu("File");
-    	Action[] actions = {new MyMenuAction("New Profile",
+    	Action[] actions = {new MenuAction("New Profile",
 								new Runnable() { public void run(){ newProfile(); } }),
-							new MyMenuAction("Load Profile",
+							new MenuAction("Load Profile",
 								new Runnable() { public void run(){ loadProfile(); } }),
-    						new MyMenuAction("New Attempt",
+    						new MenuAction("New Attempt",
     							new Runnable() { public void run(){ newAttempt(); } }),
-    						new MyMenuAction("Clear Text Area",
+    						new MenuAction("Clear Text Area",
     							new Runnable() { public void run(){ clearTextArea(); } }),
     	};
     	for(int i=0; i<actions.length; i++) {
@@ -265,7 +243,12 @@ public class MouseEventDemo extends JPanel {
     	return menuBar;
     }
     
-    void eventOutput(String eventDescription) {
+    /**
+     * Prints to the textArea
+     * @param eventDescription message to be printed 
+     * 
+     */
+   void eventOutput(String eventDescription) {
         /*textArea.append(eventDescription + " detected on "
                 + e.getComponent().getClass().getName()
                 + "." + NEWLINE);*/
@@ -273,9 +256,13 @@ public class MouseEventDemo extends JPanel {
         textArea.setCaretPosition(textArea.getDocument().getLength());
     }
     
-      
-    
-    
+
+   /**
+    * Finalizes an Attempt. Logs the statistics, outputs the result to the textArea
+    * saves information in current profile and saves the attempt data. Updates the
+    * repetition number and if its not the final task, begins a new attempt
+    * 
+    */
     public void finishAttempt()
     {	//Point2D ab = attempt.countAB();
     	//Point2D rab = attempt.refineCountAB();
@@ -327,7 +314,11 @@ public class MouseEventDemo extends JPanel {
     	
     }
     
-    public void setProfile(UserProfile u)
+    /**
+     * Sets the current user profile 
+     * 
+     */
+        public void setProfile(UserProfile u)
     {	profile = u;
     	iniFile.id = profile.id;
     	frame.setTitle("Fitt's law - "+u.name+" "+u.surname);
@@ -335,12 +326,22 @@ public class MouseEventDemo extends JPanel {
     	
     }
     
+    /**
+     * Returns the current attempt
+     * @return attempt 
+     * 
+     */
     public AttemptData getAttempt()
     {	if(attempt == null) return null;
     	return attempt;
     	
     }
     
+    /**
+     * ???
+     * @return ret 
+     * 
+     */
     int[] createOrder(int min,int max, int seed)
     {	int sel = max-min+1;
     	int m;
@@ -367,11 +368,26 @@ public class MouseEventDemo extends JPanel {
     
 }
 
+/**
+ * class to filter .fp files
+ * 
+ */
 class pfFilter extends javax.swing.filechooser.FileFilter
-{	public boolean accept(File f) {
+{	 
+/**
+ * Filters user profile (.fp) files
+ * @return true for directories and .fp files, false otherwise 
+ * 
+ */
+	public boolean accept(File f) {
         return f.isDirectory() || f.getName().toLowerCase().endsWith(".fp");
     }
-    
+
+/**
+ * Return the description of the file filter
+ * @return "Fitts profile (.fp) files"
+ * 
+ */	
     public String getDescription() {
         return "Fitts profile (.fp) files";
     }

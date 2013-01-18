@@ -5,6 +5,10 @@ import java.util.Scanner;
 
 import javax.swing.*;
 
+/**
+ * Class storing details of a user
+ */
+
 public class UserProfile {
 	public static final String[] PROFICIENCY = {"none","low","medium","high"};
 	String name;
@@ -14,6 +18,17 @@ public class UserProfile {
 	int height_mod,arm_length;
 	String proficiency,comments;
 	
+	/**
+	 * Create a new UserProfile with full set of parameters
+	 * @param n name
+	 * @param s surname
+	 * @param i id
+	 * @param a age
+	 * @param hm height
+	 * @param al arm length
+	 * @param pro proficiency
+	 * @param co comments
+	 */
 	public UserProfile(String n, String s, String i, int a, int hm, int al, String pro, String co)
 	{	name = n;
 		surname = s;
@@ -25,6 +40,10 @@ public class UserProfile {
 		proficiency = pro;
 		comments = co;
 	}
+	
+	/**
+	 * Create a blank new UserProfile
+	 */
 	public UserProfile()
 	{	name = "none";
 		surname = "none";
@@ -37,6 +56,10 @@ public class UserProfile {
 		comments = "";
 	}
 	
+	
+	/**
+	 * Save current user profile to "id".fp file
+	 */
 	public void saveProfile()
     {	PrintWriter pw;
     	try
@@ -60,6 +83,11 @@ public class UserProfile {
     	
     }
 	
+	/**
+	 * Open a dialog to load a user profile
+	 * @param fr JFrame ?? parent frame
+	 * @return loaded UserProfile or null when canceled
+	 */
 	public UserProfile loadProfile(JFrame fr)
     {	JFileChooser fc = new JFileChooser();
 		try {
@@ -78,6 +106,13 @@ public class UserProfile {
     		
     }
 	
+	/**
+	 * Load user profile from file of name s
+	 * @param fr parent frame
+	 * @param s file name
+	 * @return loaded UserProfile
+	 */
+	
 	public UserProfile loadProfile(JFrame fr,String s)
     {	File file = null;
 		try
@@ -92,7 +127,13 @@ public class UserProfile {
     		
     }
 	
-	public UserProfile loadProfile(JFrame fr,File f)
+	/**
+	 * Load user profile from file f
+	 * @param fr parent frame
+	 * @param f file to be loaded
+	 * @return loaded UserProfile
+	 */
+	private UserProfile loadProfile(JFrame fr,File f)
     {	Scanner s = null;
     	int i = 0;
     	String[] buf = new String[8];

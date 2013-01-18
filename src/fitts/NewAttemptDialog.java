@@ -10,9 +10,14 @@ import java.io.IOException;
 import java.awt.Point;
 import javax.swing.*;
 
-
-
+/**
+ * Class to handle dialog to create a new attempt for current user
+ * @author tzeentch
+ *
+ */
 public class NewAttemptDialog extends JDialog implements ActionListener, FocusListener {
+	// possible attempt parameters
+	// TODO move to an external configuration file
 	static final String[] weightTypes = { "none","0.5", "1", "1.5" ,"2","3" };
 	static final String[] targetsLabels = {"3","4","5","6","7","8","9","10","20","30","50","60","100","120","200","300","500"};
 	static final String[] diamLabels = {"variable","random","10","20","30","40","50"};
@@ -47,8 +52,10 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 	int focX,focY = 0;
 	int[] numberTargets = {3,4,5,6,7,8,9,10,20,30,50,60,100,120,200,300,500};
 	int[] diameters = {0,1,10,20,30,40,50};
+	// end of attempt parameters
+	
 	JPanel fields = new JPanel();
-	MouseEventDemo med;
+	FittsMain root;
 	JTextField[] tfields;
 	JTextField tprof;
 	JTextField distanceFld;
@@ -60,14 +67,22 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 	JTextField[][] coords = new JTextField[5][2];
 	int inType;
 	
-	public NewAttemptDialog(MouseEventDemo m)
-	{	med = m;
-		inType = med.iniFile.inType;
+	/**
+	 * Creates and opens a new attempt dialog
+	 * @param m parent
+	 */
+	public NewAttemptDialog(FittsMain m)
+	{	root = m;
+		inType = root.iniFile.inType;
 		createContent();
 		setResizable(false);
 		setEnabled(true);
 		setVisible(true);
 	}
+	
+	/**
+	 * Setup the dialog layout
+	 */
 	private void createContent()
 	{	this.getContentPane().removeAll();
 		//JPanel fields = new JPanel();
@@ -80,7 +95,7 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		
 		tprof = new JTextField();
-		tprof.setText(med.getProfile().id);
+		tprof.setText(root.getProfile().id);
 		tprof.setEditable(false);
 		tprof.setSize(new Dimension(100,15));
 		JButton bprof = new JButton("Change");
@@ -131,9 +146,9 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 			atFields.add(tfields[i]);
 			tfields[i].setEditable(false);
 		}
-		tfields[0].setText(""+(med.getProfile().attempt+1));
-		tfields[1].setText(""+med.blankArea.getWidth());
-		tfields[2].setText(""+med.blankArea.getHeight());
+		tfields[0].setText(""+(root.getProfile().attempt+1));
+		tfields[1].setText(""+root.blankArea.getWidth());
+		tfields[2].setText(""+root.blankArea.getHeight());
 		atFields.setLayout(new GridLayout(0,2));
 		atFields.setMinimumSize(new Dimension(280,60));
 		atFields.setMaximumSize(new Dimension(280,60));
@@ -177,26 +192,29 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		//this.getContentPane().setMinimumSize(new Dimension(200,200));
 		//this.getContentPane().setMaximumSize(new Dimension(200,200));
 	}
-		
+	/**
+	 * Create parameter selection fields for mouse attempts
+	 * @return JPanel with mouse fields
+	 */
 	private JPanel createMouseFields()
 	{	JPanel fl = new JPanel();
 		JPanel fields = new JPanel();
 		JPanel f2 = new JPanel();
 		fields.add(new JLabel("weights"));
 		weightList = new JComboBox<String>(weightTypes);
-		weightList.setSelectedIndex(med.iniFile.weightList);
+		weightList.setSelectedIndex(root.iniFile.weightList);
 		fields.add(weightList);
 		fields.add(new JLabel("targets"));
 		targetList = new JComboBox<String>(targetsLabels);
-		targetList.setSelectedIndex(med.iniFile.targetList);
+		targetList.setSelectedIndex(root.iniFile.targetList);
 		fields.add(targetList);
 		fields.add(new JLabel("diameter"));
 		diamList = new JComboBox<String>(diamLabels);
-		diamList.setSelectedIndex(med.iniFile.diamList);
+		diamList.setSelectedIndex(root.iniFile.diamList);
 		fields.add(diamList);
 		fields.add(new JLabel("distance"));
 		distanceFld = new JTextField();
-		distanceFld.setText(""+med.iniFile.coords[4].x);
+		distanceFld.setText(""+root.iniFile.coords[4].x);
 		fields.add(distanceFld);
 		
 		fields.setLayout(new GridLayout(0,2));
@@ -206,7 +224,7 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		f2.setLayout(new BoxLayout(f2,BoxLayout.LINE_AXIS));
 		f2.add(new JLabel("generation"));
 		typeList = new JComboBox<String>(generationType);
-		typeList.setSelectedIndex(med.iniFile.typeList);
+		typeList.setSelectedIndex(root.iniFile.typeList);
 		f2.add(typeList);
 		f2.setMaximumSize(new Dimension(280,20));
 		f2.setMinimumSize(new Dimension(280,20));
@@ -220,6 +238,10 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		return fl;
 	}
 	
+	/**
+	 * Create parameter selection fields for learn attempts
+	 * @return JPanel with learn fields
+	 */
 	private JPanel createLearnFields()
 	{	JPanel f1 = new JPanel();
 		f1.setLayout(new BoxLayout(f1,BoxLayout.PAGE_AXIS));
@@ -230,9 +252,9 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		
 		for(int i=0; i<2; i++)
 		{	coords[i][0] = new JTextField();
-			coords[i][0].setText(""+med.iniFile.coords[i].x);
+			coords[i][0].setText(""+root.iniFile.coords[i].x);
 			coords[i][1] = new JTextField();
-			coords[i][1].setText(""+med.iniFile.coords[i].y);
+			coords[i][1].setText(""+root.iniFile.coords[i].y);
 		}
 		fields.add(new JLabel("Seed"));
 		fields.add(coords[0][0]);
@@ -255,19 +277,23 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		return f1;
 	}
 	
+	/**
+	 * Create parameter selection fields for key attempts
+	 * @return JPanel with key fields
+	 */
 	private JPanel createKeyFields()
 	{	JPanel fields = new JPanel();
 		fields.add(new JLabel("weights"));
 		weightList = new JComboBox<String>(weightTypes);
-		weightList.setSelectedIndex(med.iniFile.weightList);
+		weightList.setSelectedIndex(root.iniFile.weightList);
 		fields.add(weightList);
 		fields.add(new JLabel("targets"));
 		targetList = new JComboBox<String>(targetsLabels);
-		targetList.setSelectedIndex(med.iniFile.targetList);
+		targetList.setSelectedIndex(root.iniFile.targetList);
 		fields.add(targetList);
 		fields.add(new JLabel("generation"));
 		keyTypeList = new JComboBox<String>(keyGenerationType);
-		keyTypeList.setSelectedIndex(med.iniFile.keyTypeList);
+		keyTypeList.setSelectedIndex(root.iniFile.keyTypeList);
 		fields.add(keyTypeList);
 		
 		JPanel coordsField = new JPanel();
@@ -279,11 +305,11 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		for(int i=0; i<5; i++)
 		{	coords[i] = new JTextField[2];
 			coords[i][0] = new JTextField();
-			coords[i][0].setText(""+med.iniFile.coords[i].x);
+			coords[i][0].setText(""+root.iniFile.coords[i].x);
 			coords[i][0].setName("coord"+i+",0");
 			coords[i][0].addFocusListener(this);
 			coords[i][1] = new JTextField();
-			coords[i][1].setText(""+med.iniFile.coords[i].y);
+			coords[i][1].setText(""+root.iniFile.coords[i].y);
 			coords[i][1].setName("coord"+i+",1");
 			coords[i][1].addFocusListener(this);
 			
@@ -347,17 +373,24 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		return ufields;
 	}
 	
+	/**
+	 * Reload user data and workspace data from parent
+	 */
 	public void reloadData()
-	{	tfields[0].setText(""+(med.getProfile().attempt+1));
-		tfields[1].setText(""+med.blankArea.getWidth());
-		tfields[2].setText(""+med.blankArea.getHeight());
-		tprof.setText(med.getProfile().id);
+	{	tfields[0].setText(""+(root.getProfile().attempt+1));
+		tfields[1].setText(""+root.blankArea.getWidth());
+		tfields[2].setText(""+root.blankArea.getHeight());
+		tprof.setText(root.getProfile().id);
 	}
 	
+	/**
+	 * Handle actions in dialog
+	 * @param e action performed
+	 */
 	public void actionPerformed(ActionEvent e)
 	{	if(e.getActionCommand() == "change")
 		{	setVisible(false);
-			med.loadProfile();
+			root.loadProfile();
 			reloadData();
 			setVisible(true);
 		
@@ -368,21 +401,21 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		}
 		if(e.getActionCommand()=="start")
 		{	setVisible(false);
-			med.blankArea.requestFocus();
+			root.blankArea.requestFocus();
 			if(inType == AttemptData.MOUSE || inType == AttemptData.KEY)
-			{	med.iniFile.weightList = weightList.getSelectedIndex();
-				med.iniFile.targetList = targetList.getSelectedIndex();
+			{	root.iniFile.weightList = weightList.getSelectedIndex();
+				root.iniFile.targetList = targetList.getSelectedIndex();
 			}
 			if(inType == AttemptData.MOUSE) 
-			{	med.iniFile.diamList = diamList.getSelectedIndex();
-				med.iniFile.typeList = typeList.getSelectedIndex();
+			{	root.iniFile.diamList = diamList.getSelectedIndex();
+				root.iniFile.typeList = typeList.getSelectedIndex();
 			}
 			if(inType == AttemptData.KEY) 
-			{	med.iniFile.keyTypeList = keyTypeList.getSelectedIndex();
+			{	root.iniFile.keyTypeList = keyTypeList.getSelectedIndex();
 				for(int i=0;i<5;i++)
 				{	int x=new Double(coords[i][0].getText()).intValue();
 					int y=new Double(coords[i][1].getText()).intValue();
-					med.iniFile.coords[i] = new Point(x,y);
+					root.iniFile.coords[i] = new Point(x,y);
 				}
 			}
 			if(inType == AttemptData.LEARN) 
@@ -390,68 +423,68 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 				for(int i=0;i<2;i++)
 				{	int x=new Double(coords[i][0].getText()).intValue();
 					int y=new Double(coords[i][1].getText()).intValue();
-					med.iniFile.coords[i] = new Point(x,y);
+					root.iniFile.coords[i] = new Point(x,y);
 				}
 			}
-			med.iniFile.inType = inType;
+			root.iniFile.inType = inType;
 			try
-			{	med.iniFile.save();
+			{	root.iniFile.save();
 			
 			}
 			catch(IOException ex)
-			{	JOptionPane.showMessageDialog(med, "Couldn't save preferences to ini file.");
+			{	JOptionPane.showMessageDialog(root, "Couldn't save preferences to ini file.");
 				
 			}
 			if(inType == AttemptData.MOUSE) 
-			{	med.iniFile.coords[4].x=new Double(distanceFld.getText()).intValue();
-				med.setAttempt(new AttemptData(med.getProfile().id,
+			{	root.iniFile.coords[4].x=new Double(distanceFld.getText()).intValue();
+				root.setAttempt(new AttemptData(root.getProfile().id,
 					new Double(tfields[0].getText()).intValue(),
 					inType,
 					weightTypes[weightList.getSelectedIndex()],
-					med.blankArea.getWidth(),med.blankArea.getHeight(),
+					root.blankArea.getWidth(),root.blankArea.getHeight(),
 					numberTargets[targetList.getSelectedIndex()]+1,
 					generationType[typeList.getSelectedIndex()], 
 					diameters[diamList.getSelectedIndex()],
-					med.iniFile.coords
+					root.iniFile.coords
 					));
-				med.blankArea.createFirstMouseTarget(med.getAttempt());
-				med.blankArea.setFocusTraversalPolicyProvider(true);
+				root.blankArea.createFirstMouseTarget(root.getAttempt());
+				root.blankArea.setFocusTraversalPolicyProvider(true);
 			}
 			if(inType == AttemptData.KEY) 
-			{	med.setAttempt(new AttemptData(med.getProfile().id,
+			{	root.setAttempt(new AttemptData(root.getProfile().id,
 					new Double(tfields[0].getText()).intValue(),
 					inType,
 					weightTypes[weightList.getSelectedIndex()],
-					med.blankArea.getWidth(),med.blankArea.getHeight(),
+					root.blankArea.getWidth(),root.blankArea.getHeight(),
 					numberTargets[targetList.getSelectedIndex()+1],
 					keyGenerationType[keyTypeList.getSelectedIndex()],
 					0,
-					med.iniFile.coords));
-				med.getAttempt().targetCharCode = KeyEvent.VK_F8;
-				med.blankArea.createFirstKeyTarget(med.getAttempt());
-				med.blankArea.setEnabled(true);
-				med.blankArea.setFocusTraversalPolicyProvider(true);
+					root.iniFile.coords));
+				root.getAttempt().targetCharCode = KeyEvent.VK_F8;
+				root.blankArea.createFirstKeyTarget(root.getAttempt());
+				root.blankArea.setEnabled(true);
+				root.blankArea.setFocusTraversalPolicyProvider(true);
 				//System.out.println(med.blankArea.getKeyListeners());
 					
 			}
 			if(inType == AttemptData.LEARN) 
-			{	med.Order = med.createOrder(med.iniFile.coords[1].x,med.iniFile.coords[1].y,med.iniFile.coords[0].x);
-				med.Task = 0;
-				med.setAttempt(new AttemptData(med.getProfile().id,
+			{	root.Order = root.createOrder(root.iniFile.coords[1].x,root.iniFile.coords[1].y,root.iniFile.coords[0].x);
+				root.Task = 0;
+				root.setAttempt(new AttemptData(root.getProfile().id,
 					new Double(tfields[0].getText()).intValue(),
 					inType,
 					weightTypes[0],
-					med.blankArea.getWidth(),med.blankArea.getHeight(),
-					med.Order[med.Task],
+					root.blankArea.getWidth(),root.blankArea.getHeight(),
+					root.Order[root.Task],
 					"learn", 
 					30,
-					med.iniFile.coords
+					root.iniFile.coords
 					));
-				med.MaxRepetitions = med.iniFile.coords[0].y;
-				med.MaxTask = med.iniFile.coords[1].y-med.iniFile.coords[1].x+1;
-				med.Repetition = 0;
-				med.blankArea.createFirstLearnTarget(med.getAttempt());
-				med.blankArea.setFocusTraversalPolicyProvider(true);
+				root.MaxRepetitions = root.iniFile.coords[0].y;
+				root.MaxTask = root.iniFile.coords[1].y-root.iniFile.coords[1].x+1;
+				root.Repetition = 0;
+				root.blankArea.createFirstLearnTarget(root.getAttempt());
+				root.blankArea.setFocusTraversalPolicyProvider(true);
 				
 			}
 		}
@@ -499,6 +532,11 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		}
 	}
 	
+	/**
+	 * Change physical coordinates (distance) of the keys
+	 * (used for external keys handled by keyboard input) 
+	 * @param up
+	 */
 	void updateCoords(int up)
 	{	JTextField jt = coords[focX][focY];
 		int i=new Double(jt.getText()).intValue();
@@ -511,6 +549,10 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		
 	}
 	
+	/**
+	 * @param s generationType name
+	 * @return generationType index
+	 */
 	public static int generationType(String s)
 	{	int i=0;
 		for(i=0;i<generationType.length; i++)
@@ -520,6 +562,10 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		return 0;
 	}
 	
+	/**
+	 * Handle gain of focus
+	 * @param e focus event
+	 */
 	public void focusGained(FocusEvent e) 
 	{	String s=e.getComponent().getName();
 		focX=new Double(s.substring(5,6)).intValue();
@@ -530,6 +576,7 @@ public class NewAttemptDialog extends JDialog implements ActionListener, FocusLi
 		jt.setSelectionEnd(len);
 		
 	}
+	
 	
 	public void focusLost(FocusEvent e) {
 		// TODO Auto-generated method stub

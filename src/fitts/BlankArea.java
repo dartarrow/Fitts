@@ -10,23 +10,37 @@ import java.awt.geom.Ellipse2D;
 import java.awt.Point;
 import java.awt.event.*;
 
+/**
+ * Class to control the workspace behavior - appearance of targets etc..
+ * @author tzeentch
+ *
+ */
+
 public class BlankArea extends JPanel {
 	//Dimension minSize = new Dimension(500, 500);
 	static final long serialVersionUID = 0;
     Ellipse2D.Double circle = null;
     static final int X_SIZE = 900;
     static final int Y_SIZE = 450;
-    MouseEventDemo med;
+    FittsMain root;
 
-    public BlankArea(MouseEventDemo m, Color color) {
+    /**
+     * Creator of the workspace
+     * @param m parent
+     * @param color color of the orkspace (Color)
+     */
+    public BlankArea(FittsMain m, Color color) {
         setBackground(color);
         setOpaque(true);
         setBorder(BorderFactory.createLineBorder(Color.black));
-        med = m;
+        root = m;
         //circle = new Ellipse2D.Double(5, 5, 10, 10);
         
     }
 
+    /**
+     * focus traversing
+     */
     public boolean isFocusTraversable() {
         return true;
       }
@@ -43,12 +57,21 @@ public class BlankArea extends JPanel {
         return minSize;
     }*/
     
+    /**
+     * Paint a component to the workspace
+     */
     public void paintComponent(Graphics g) {
     	super.paintComponent(g);
     	Graphics2D g2d = (Graphics2D)g;
     	if(circle != null) g2d.draw(circle);
     }
     
+    /**
+     * Set parameters of a new target
+     * @param x X coordinates
+     * @param y Y coordinates
+     * @param d diameter
+     */
     public void setNewCircle(double x, double y, double d) {
     	circle = new Ellipse2D.Double(); 
     	circle.x = x;
@@ -58,6 +81,11 @@ public class BlankArea extends JPanel {
     	//System.out.println(" x:"+x+"/"+(x+d)+" y:"+y+"/"+(y+d)+" d:"+d);
     }
     
+    /**
+     * Generate a new target for mouse clicking in the attempt according to the attempts parameters
+     * @param attempt the attempt under which is the new target generated
+     * @return target coordinates
+     */
     public Point createNewMouseTarget(AttemptData attempt)
     {	int tx,ty,nd;
     	int att = NewAttemptDialog.generationType(attempt.type);
@@ -117,7 +145,7 @@ public class BlankArea extends JPanel {
 				if(att == NewAttemptDialog.HORIZONTAL_DEFINED || 
 					(att == NewAttemptDialog.HORIZONTAL_SHORT_LONG 
 					   && attempt.target < attempt.maxTargets/2) )
-					dist = med.iniFile.coords[4].x;
+					dist = root.iniFile.coords[4].x;
 				if(att == NewAttemptDialog.HORIZONTAL_SHORT_LONG 
 					   && attempt.target >= attempt.maxTargets/2 )
 					dist = X_SIZE*7/8;
@@ -171,7 +199,7 @@ public class BlankArea extends JPanel {
 				att == NewAttemptDialog.HORIZONTAL_FIVE_STEP_UNADJUSTED || 
 				att == NewAttemptDialog.RETURN_TO_CENTER_FIXED || 
 				att == NewAttemptDialog.RETURN_TO_CENTER_RANDOM) ty=ty+0;
-		else ty+=med.profile.height_mod;
+		else ty+=root.profile.height_mod;
 		//System.out.println(ty+" "+med.profile.height_mod);
 		setNewCircle(tx, ty, nd);
 		JLabel label = new JLabel(attempt.target+"");
@@ -187,6 +215,12 @@ public class BlankArea extends JPanel {
     	
     }
     
+    /**
+     * Generate a new target for button pressing (not only keyboard but also external buttons handled via keyboard)
+     * in the attempt according to the attempts parameters
+     * @param attempt the attempt under which is the new target generated
+     * @return key to be pressed (KeyEvent key definitions)
+     */
     public char createNewKeyTarget(AttemptData attempt)
 	{	if(attempt.type == NewAttemptDialog.keyGenerationType[NewAttemptDialog.KEY_TWO])
 		{	if(attempt.target%2 == 0) return KeyEvent.VK_F4;
@@ -201,6 +235,9 @@ public class BlankArea extends JPanel {
 		
 	}
     
+    /**
+     * Attempt is finished, print a big DONE on the screen
+     */
     public void done()
     {	removeAll();
     	JLabel d = new JLabel("done");
@@ -212,6 +249,11 @@ public class BlankArea extends JPanel {
     	repaint();
     }
     
+    /**
+     * 
+     * @param attempt
+     * @return
+     */
     public Point createFirstMouseTarget(AttemptData attempt)
     {	removeAll();
     	JLabel jl=new JLabel("Click the circle to start!");
@@ -243,10 +285,10 @@ public class BlankArea extends JPanel {
     public Point createFirstLearnTarget(AttemptData attempt)
     {	removeAll();
     	
-    	String s2 = "Úkol "+(med.Task+1)+" z "+med.MaxTask;
+    	String s2 = "Úkol "+(root.Task+1)+" z "+root.MaxTask;
     	String s="Postupnì se objeví "+attempt.maxTargets+" terèù.\n" +
     			"Snaž se je zasáhnout co nejrychleji, a zapamatovat si je.\n" +
-    			"Tato kombinace se bude opakovat. Opakování "+(med.Repetition+1)+"/"+med.MaxRepetitions+"\n" +
+    			"Tato kombinace se bude opakovat. Opakování "+(root.Repetition+1)+"/"+root.MaxRepetitions+"\n" +
     			"Zaèni kliknutím na koleèko.";
     	//System.out.println(med.Task+" task");
     	JTextArea jt=new JTextArea(s);

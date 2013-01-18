@@ -4,16 +4,27 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+/**
+ * Class to handle dialog for creation of new user profile
+ * @author tzeentch
+ *
+ */
+
 public class NewProfileDialog extends JDialog implements ActionListener {
 	static final long serialVersionUID = 0;
 	JTextField[] tfields;
 	JTextArea textArea;
-	int hm = 0;
-	MouseEventDemo med;	
-	public NewProfileDialog(MouseEventDemo m)
+	int height_modifier = 0;
+	FittsMain root;	
+	
+	/**
+	 * constructor - sets m as the parent
+	 * @param m parent
+	 */
+	public NewProfileDialog(FittsMain m)
 	{	JPanel fields = new JPanel();
 		JPanel buttons = new JPanel();
-		med = m;
+		root = m;
 		setAlwaysOnTop(true);
 		setModalityType(DEFAULT_MODALITY_TYPE);
 		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -77,45 +88,46 @@ public class NewProfileDialog extends JDialog implements ActionListener {
 		setEnabled(true);
 		
 		
-		BlankArea ba = med.blankArea;
+		BlankArea ba = root.blankArea;
 		ba.setNewCircle(BlankArea.X_SIZE/16, BlankArea.Y_SIZE*5/16, 30);
 		ba.repaint();
 		setVisible(true);
 		
 	}
 	
+	/**
+	 * Handle actions performed on the dialog
+	 * currently: cancel, plus, minus, create, 
+	 */
+	 
+	
 	public void actionPerformed(ActionEvent e)
-	{	//System.out.println("ksa");
-		if(e.getActionCommand()=="cancel")
-		{	//System.out.println("kilil");
-			setVisible(false);
+	{	if(e.getActionCommand()=="cancel")
+		{	setVisible(false);
 			return;
 		}
 		if(e.getActionCommand()=="plus")
-		{	//System.out.println("kilil");
-			med.blankArea.circle.y-=5;
-			hm -= 5;
-			med.setEnabled(true);
-			med.blankArea.repaint();
+		{	root.blankArea.circle.y-=5;
+			height_modifier -= 5;
+			root.setEnabled(true);
+			root.blankArea.repaint();
 			setEnabled(true);
-			tfields[6].setText(hm+"");
+			tfields[6].setText(height_modifier+"");
 			tfields[6].repaint();
 			return;
 		}
 		if(e.getActionCommand()=="minus")
-		{	//System.out.println("kilil");
-			med.blankArea.circle.y+=5;
-			hm += 5;
-			med.setEnabled(true);
-			med.blankArea.repaint();
+		{	root.blankArea.circle.y+=5;
+			height_modifier += 5;
+			root.setEnabled(true);
+			root.blankArea.repaint();
 			setEnabled(true);
-			tfields[6].setText(hm+"");
+			tfields[6].setText(height_modifier+"");
 			tfields[6].repaint();
 			return;
 		}
 		if(e.getActionCommand()=="create")
-		{	
-			med.setProfile(new UserProfile(tfields[0].getText(),
+		{	root.setProfile(new UserProfile(tfields[0].getText(),
 										   tfields[1].getText(),
 										   tfields[2].getText(),
 										   new Double(tfields[3].getText()).intValue(),
@@ -123,7 +135,7 @@ public class NewProfileDialog extends JDialog implements ActionListener {
 										   new Double(tfields[4].getText()).intValue(),
 										   tfields[5].getText(),
 										   textArea.getText()));
-			med.saveProfile();
+			root.saveProfile();
 			setVisible(false);
 			
 			

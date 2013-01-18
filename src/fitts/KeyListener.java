@@ -1,29 +1,45 @@
 package fitts;
 
-import java.awt.event.KeyListener;
 import java.awt.event.KeyEvent;
 import java.awt.Font;
 import java.awt.Point;
 import javax.swing.JLabel;
 import java.awt.Rectangle;
 
-public class FittsKeyListener extends Object implements KeyListener {
+/**
+ * handles keyboard input in the workspace
+ * @author tzeentch
+ *
+ */
 
-	MouseEventDemo med;
+public class KeyListener extends Object implements java.awt.event.KeyListener {
+
+	FittsMain root;
 	
-	public FittsKeyListener(MouseEventDemo m)
-	{	med = m;
+	/**
+	 * Constructor
+	 * @param m parent
+	 */
+	public KeyListener(FittsMain m)
+	{	root = m;
 		
 	}
 	
+	/**
+	 * Currently does nothing
+	 * @param e key typed
+	 */
 	public void keyTyped(KeyEvent e) {
 	  //displayInfo(e, "KEY TYPED: ");
 	}
 
-	/** Handle the key pressed event from the text field. */
+	/** 
+	 * Handle the key pressed event from the text field.
+	 * @param e key pressed 
+	 */
 	public void keyPressed(KeyEvent e) {
-		AttemptData attempt = med.getAttempt();
-		BlankArea blankArea = med.blankArea;
+		AttemptData attempt = root.getAttempt();
+		BlankArea blankArea = root.blankArea;
 		Point m=new Point(),n = new Point();
 		int s=0;
 		
@@ -35,55 +51,64 @@ public class FittsKeyListener extends Object implements KeyListener {
 		
 		
 		if(attempt.targetCharCode == KeyEvent.VK_F4)
-		{ m=med.iniFile.coords[0]; n=m; s=1; }
+		{ m=root.iniFile.coords[0]; n=m; s=1; }
 		if(attempt.targetCharCode == KeyEvent.VK_F5)
-		{ m=med.iniFile.coords[1]; s=1; }
+		{ m=root.iniFile.coords[1]; s=1; }
 		if(attempt.targetCharCode == KeyEvent.VK_F6)
-		{ m=med.iniFile.coords[2]; s=1; }
+		{ m=root.iniFile.coords[2]; s=1; }
 		if(attempt.targetCharCode == KeyEvent.VK_F7)
-		{ m=med.iniFile.coords[3]; s=1; }
+		{ m=root.iniFile.coords[3]; s=1; }
 		if(attempt.targetCharCode == KeyEvent.VK_F8)
-		{ m=med.iniFile.coords[4]; s=1; }
+		{ m=root.iniFile.coords[4]; s=1; }
 		
 		
 		if(e.getKeyCode() == attempt.targetCharCode)
 		{	attempt.addHit(m,n,s);
-    		med.eventOutput(attempt.dumpInfo(attempt.target-1));
+    		root.eventOutput(attempt.dumpInfo(attempt.target-1));
     		if(!attempt.finished()) 
     		{	int cr = blankArea.createNewKeyTarget(attempt);
-    			BlankArea bla = med.blankArea;
+    			BlankArea bla = root.blankArea;
     			JLabel jl=new JLabel(KeyEvent.getKeyText(cr));
     			Rectangle rect=new Rectangle(50,400,60,60);
-    			med.getAttempt().targetCharCode = cr;
+    			root.getAttempt().targetCharCode = cr;
     			bla.removeAll();
     			bla.repaint();
     			if(cr==KeyEvent.VK_F4) rect.x=50;
     			if(cr==KeyEvent.VK_F8) rect.x=450;
     			if(cr==KeyEvent.VK_F6) rect.x=250;
     			jl.setFont(new Font("Serif",Font.PLAIN,36));
-    			med.blankArea.add(jl);
+    			root.blankArea.add(jl);
     			jl.setBounds(rect);
     			
     		}
-    		else med.finishAttempt();
+    		else root.finishAttempt();
     		
     		
-    		System.out.println("targetChar:" +KeyEvent.getKeyText(med.getAttempt().targetCharCode)+"\n");
+    		System.out.println("targetChar:" +KeyEvent.getKeyText(root.getAttempt().targetCharCode)+"\n");
 		}
 		else 
 		{	attempt.addMiss(m,n);
-			med.eventOutput("Miss! "+m+"/"+n);
+			root.eventOutput("Miss! "+m+"/"+n);
 		}
 			
 		//displayInfo(e, "KEY PRESSED: ");
 	
 	}
 
-	/** Handle the key released event from the text field. */
+	/** 
+	 * Handle the key released event from the text field.
+	 * @param e key released 
+	 */
 	public void keyReleased(KeyEvent e) {
 	  //displayInfo(e, "KEY RELEASED: ");
 	}
 	
+	/**
+	 * Display information about keys being pressed in the text area
+	 * in the format "leading string" "key event description"
+	 * @param e key event
+	 * @param s leading string
+	 */
 	protected void displayInfo(KeyEvent e, String s) {
 	    String keyString, modString, tmpString, actionString, locationString;
 
@@ -132,7 +157,7 @@ public class FittsKeyListener extends Object implements KeyListener {
 	    /*med.textArea.append(s + "\n    " + keyString + "\n    "
 	        + modString + "\n    " + actionString 
 	        + "\n    " + locationString +"\n");*/
-	    med.textArea.append(s+" "+keyString);
-	    med.textArea.setCaretPosition(med.textArea.getDocument().getLength());
+	    root.textArea.append(s+" "+keyString);
+	    root.textArea.setCaretPosition(root.textArea.getDocument().getLength());
 	  }
 }

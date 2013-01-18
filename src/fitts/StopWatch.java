@@ -8,6 +8,10 @@ package fitts;
     (at your option) any later version.
 */
 
+/**
+ * Class for measuring time between events
+ */
+
 public class StopWatch {
     
     private long startTime = 0;
